@@ -1,4 +1,5 @@
 from setuptools import setup, find_packages, Extension
+from sysconfig import get_path
 from mktstructure import (
     __version__,
     __description__,
@@ -11,7 +12,9 @@ requires = ["requests", "numba", "pandas", "numpy"]
 
 trth_parser = Extension(
     "mktstructure.trth_parser",
+    include_dirs=[get_path("platinclude")],
     sources=["mktstructure/trth_parser.c"],
+    language="C",
 )
 
 setup(
