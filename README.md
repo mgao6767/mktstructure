@@ -54,7 +54,7 @@ Download the tick history of all S&P500 component stocks from 2022-01-01 to 2022
 mktstructure -u XXXXXX -p XXXXXX --sp500 -b 2022-01-01 -e 2022-02-01 -o sp500.csv.gz
 ```
 
-Or furthuer, download and parse the downloaded data:
+Or further, download and parse the downloaded data:
 
 ```bash
 mktstructure -u XXXXXX -p XXXXXX --sp500 -b 2022-01-01 -e 2022-02-01 -o sp500.csv.gz --parse --datadir "./data"
@@ -83,7 +83,3 @@ d-----         6/03/2022   3:51 PM                ZBRA.OQ
 d-----         6/03/2022   3:51 PM                ZION.OQ
 d-----         6/03/2022   3:51 PM                ZTS.N
 ```
-
-<!-- ## Acknowledgement
-
-I acknowledge the financial support from the University of Sydney for my RA work developing this tool. -->
