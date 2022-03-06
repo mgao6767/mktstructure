@@ -33,7 +33,7 @@ struct Fields *get_meta_info(FILE *file, int close_after_read);
 void process(FILE *file, struct Fields *meta, const char *output_dir,
              int replace);
 int save_chunk(char *RIC, char *local_date, const char *fields, char **chunk,
-               ssize_t chunk_size, const char *output_dir, int replace);
+               size_t chunk_size, const char *output_dir, int replace);
 int mkdir_p(const char *dir, const int mode);
 
 // Store meta info of the file.
@@ -132,7 +132,7 @@ void process(FILE *file, struct Fields *meta, const char *output_dir,
   // This needs to be dynamically managed, but for now let's make it static.
   char **chunk = malloc(sizeof(char *) * CHUNK_LENGTH);
   // Total number of transactions (lines) of a chunk.
-  ssize_t numTransactions = 0;
+  size_t numTransactions = 0;
   // Read line by line.
   while (fgets(buffer, BUFSIZE, file)) {
     // Get a pointer to current line.
@@ -246,7 +246,7 @@ char *get_local_date(char *datetimeISO, int GMT_offset) {
 }
 
 int save_chunk(char *RIC, char *local_date, const char *fields, char **chunk,
-               ssize_t chunk_size, const char *output_dir, int replace) {
+               size_t chunk_size, const char *output_dir, int replace) {
   char path[PATH_MAX_STRING_SIZE];
   strcpy(path, output_dir);
   const int len = strnlen(path, PATH_MAX_STRING_SIZE);
@@ -291,7 +291,7 @@ int save_chunk(char *RIC, char *local_date, const char *fields, char **chunk,
     outputFile = fopen(output_file, mode);
     fprintf(outputFile, "%s", fields);
   }
-  for (ssize_t i = 0; i < chunk_size; i++) {
+  for (size_t i = 0; i < chunk_size; i++) {
     fprintf(outputFile, "%s", chunk[i]);
     free(chunk[i]);
     chunk[i] = NULL;
