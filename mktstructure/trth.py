@@ -1,7 +1,7 @@
 import requests
 import time
 
-from utils import make_request_index_components, make_request_tick_history
+from .utils import make_request_index_components, make_request_tick_history
 
 # URL_BASE = "https://hosted.datascopeapi.reuters.com/RestApi/v1"
 URL_BASE = "https://selectapi.datascope.refinitiv.com/RestApi/v1"

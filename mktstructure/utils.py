@@ -4,9 +4,8 @@ from typing import List, Dict
 from numba import jit
 import pandas as pd
 import numpy as np
-from request_templates import INDEX_COMPONENTS, INTRADAY_TICKS
+from .request_templates import INDEX_COMPONENTS, INTRADAY_TICKS
 
-# from frds import data_dir
 
 SP500_RIC = "0#.SPX"
 NASDAQ_RIC = "0#.NDX"
