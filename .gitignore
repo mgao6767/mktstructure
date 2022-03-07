@@ -1,3 +1,8 @@
+# tmp files
+*.csv
+*.xlsx
+*.gz
+
 # Test dirs
 data/
 
