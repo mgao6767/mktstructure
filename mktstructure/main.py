@@ -21,66 +21,159 @@ def init_argparse() -> argparse.ArgumentParser:
         action="version",
         version=f"{parser.prog} version {__version__}",
     )
-    parser.add_argument(
+    # subparsers
+    subparsers = parser.add_subparsers(
+        title="Sub-commands",
+        dest="command",
+        description="Choose one from the following. Use `mktstructure subcommand -h` to see help for each sub-command.",
+    )
+    parser_download = subparsers.add_parser(
+        "download",
+        description="Download data from Refinitiv Tick History",
+        help="Download data from Refinitiv Tick History",
+    )
+    parser_clean = subparsers.add_parser(
+        "clean",
+        description="Clean the data in the data directory",
+        help="Clean downloaded data",
+    )
+    parser_classify = subparsers.add_parser(
+        "classify",
+        description="Classify ticks into buy and sell orders using Lee and Ready (1991) algorithm",
+        help="Classify ticks into buy and sell orders",
+    )
+    parser_compute = subparsers.add_parser(
+        "compute",
+        description="Compute specified measures",
+        help="Compute market microstructure measures",
+    )
+
+    # subparser for `download` subcommand
+    parser_download.add_argument(
         "-u",
         metavar="user",
         help="DataScope username",
     )
-    parser.add_argument(
+    parser_download.add_argument(
         "-p",
         metavar="password",
         help="DataScope password",
     )
-    parser.add_argument(
+    parser_download.add_argument(
         "-b",
         metavar="begin",
         default="2021-02-15",
         help="begin UTC date (YYYY-MM-DD)",
     )
-    parser.add_argument(
+    parser_download.add_argument(
         "-e",
         metavar="end",
         default="2021-02-28",
         help="end UTC date (YYYY-MM-DD)",
     )
-    parser.add_argument(
+    parser_download.add_argument(
         "-o",
         metavar="out",
         default="out.csv.gz",
         help="output file path",
     )
-    parser.add_argument(
+    parser_download.add_argument(
         "--ric",
         nargs="*",
         default=[],
         help="RIC of securities to process",
     )
-    parser.add_argument(
+    parser_download.add_argument(
         "--sp500",
         default=False,
         const=True,
         action="store_const",
         help="if set, process all S&P500 components (extending RIC list, if any)",
     )
-    parser.add_argument(
+    parser_download.add_argument(
         "--parse",
         default=False,
         const=True,
         action="store_const",
         help="if set, parse the downloaded raw data to output data directory",
     )
-    parser.add_argument(
+    parser_download.add_argument(
         "--data_dir",
         metavar="dir",
         default="./data",
         help="output data directory (used when --parse is set)",
     )
+
+    # parser for `clean` subcommand
+    parser_clean.add_argument(
+        "--ric",
+        nargs="*",
+        default=[],
+        help="RIC of securities to clean",
+    )
+    parser_clean.add_argument(
+        "-b",
+        metavar="begin",
+        default="2021-02-15",
+        help="begin UTC date (YYYY-MM-DD)",
+    )
+    parser_clean.add_argument(
+        "-e",
+        metavar="end",
+        default="2021-02-28",
+        help="end UTC date (YYYY-MM-DD)",
+    )
+    parser_clean.add_argument(
+        "--data_dir",
+        metavar="dir",
+        help="data directory",
+        required=True,
+    )
+    parser_clean.add_argument(
+        "--all",
+        default=False,
+        const=True,
+        action="store_const",
+        help="if set, clean all data in the data director",
+    )
+
+    # parser for `classify` subcommand
+    parser_classify.add_argument(
+        "--ric",
+        nargs="*",
+        default=[],
+        help="RIC of securities to clean",
+    )
+    parser_classify.add_argument(
+        "-b",
+        metavar="begin",
+        default="2021-02-15",
+        help="begin UTC date (YYYY-MM-DD)",
+    )
+    parser_classify.add_argument(
+        "-e",
+        metavar="end",
+        default="2021-02-28",
+        help="end UTC date (YYYY-MM-DD)",
+    )
+    parser_classify.add_argument(
+        "--data_dir",
+        metavar="dir",
+        help="data directory",
+        required=True,
+    )
+    parser_classify.add_argument(
+        "--all",
+        default=False,
+        const=True,
+        action="store_const",
+        help="if set, classify all data in the data director",
+    )
+
     return parser
 
 
-def main():
-    parser = init_argparse()
-    args = parser.parse_args()
+def cmd_download(args: argparse.Namespace):
 
     start_date = f"{args.b}T00:00:00.000Z"
     end_date = f"{args.e}T00:00:00.000Z"
@@ -114,6 +207,35 @@ def main():
         parse_to_data_dir("__tmp.csv", args.data_dir, "1")
 
         os.remove("__tmp.csv")
+
+
+def cmd_clean(args: argparse.Namespace):
+    pass
+
+
+def cmd_classify(args: argparse.Namespace):
+    pass
+
+
+def cmd_compute(args: argparse.Namespace):
+    pass
+
+
+def main():
+    parser = init_argparse()
+    args = parser.parse_args()
+
+    if args.command == "download":
+        cmd_download(args)
+
+    if args.command == "clean":
+        cmd_clean(args)
+
+    if args.command == "classify":
+        cmd_classify(args)
+
+    if args.command == "compute":
+        cmd_compute(args)
 
 
 if __name__ == "__main__":
