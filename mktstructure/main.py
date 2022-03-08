@@ -129,6 +129,13 @@ def init_argparse() -> argparse.ArgumentParser:
         action="store_const",
         help="if set, clean all data in the data director",
     )
+    parser_clean.add_argument(
+        "--replace",
+        default=False,
+        const=True,
+        action="store_const",
+        help="if set, replace raw data with cleaned data",
+    )
 
     # parser for `classify` subcommand
     parser_classify.add_argument(
@@ -171,22 +178,22 @@ def main():
     args = parser.parse_args()
 
     if args.command == "download":
-        from cmd_download import cmd_download
+        from .cmd_download import cmd_download
 
         cmd_download(args)
 
     if args.command == "clean":
-        from cmd_clean import cmd_clean
+        from .cmd_clean import cmd_clean
 
         cmd_clean(args)
 
     if args.command == "classify":
-        from cmd_classify import cmd_classify
+        from .cmd_classify import cmd_classify
 
         cmd_classify(args)
 
     if args.command == "compute":
-        from cmd_compute import cmd_compute
+        from .cmd_compute import cmd_compute
 
         cmd_compute(args)
 
