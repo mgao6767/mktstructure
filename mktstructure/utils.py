@@ -52,17 +52,7 @@ def make_request_tick_history(rics: List[str], date_start, date_end):
     return request
 
 
-def get_data_path(ric, date):
-    return os.path.join(data_dir, "TRTH", "parsed_data", ric, f"{date}.csv.gz")
-
-
-def lee_and_ready(ric, date) -> pd.DataFrame:
-    data_path = get_data_path(ric, date)
-    # Read in sorted data
-    if not os.path.isfile(data_path):
-        return None
-    # Parse_dates here will result in loss of nanosecond precision!
-    df = pd.read_csv(data_path, compression="gzip")
+def lee_and_ready(df: pd.DataFrame) -> pd.DataFrame:
     # Convert to pd.DatetimeIndex to preserve nanoseconds.
     df["Date-Time"] = pd.DatetimeIndex(df["Date-Time"])
     # Get GMT Offset
@@ -73,7 +63,8 @@ def lee_and_ready(ric, date) -> pd.DataFrame:
     df.set_index("Date-Time", inplace=True)
     # Keep only trades/quotes during normal trading hours.
     # TODO: Check RIC and get trading hours for non US exchanges.
-    df = df.between_time(start_time="09:30", end_time="16:00")
+    # without `.copy()` there is hidden chaining causing `SettingSettingWithCopyWarning` warning
+    df = df.between_time(start_time="09:30", end_time="16:00").copy()
     # Prepare for Lee and Ready.
     prices = df["Price"].to_numpy()
     bids = df["Bid Price"].to_numpy()
