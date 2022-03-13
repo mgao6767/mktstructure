@@ -1,7 +1,7 @@
 import argparse
 import gzip
 import os
-from shutil import copyfileob
+from shutil import copyfileobj
 
 from .utils import extract_index_components_ric
 from .utils import SP500_RIC, NASDAQ_RIC, NYSE_RIC
