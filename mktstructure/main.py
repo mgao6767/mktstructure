@@ -1,5 +1,7 @@
 import argparse
 
+from numpy import require
+
 from mktstructure import __description__, __version__
 
 
@@ -168,6 +170,52 @@ def init_argparse() -> argparse.ArgumentParser:
         const=True,
         action="store_const",
         help="if set, classify all data in the data director",
+    )
+
+    # parser for `compute` subcommand
+    parser_compute.add_argument(
+        "--ric",
+        nargs="*",
+        default=[],
+        help="RIC of securities to clean",
+    )
+    parser_compute.add_argument(
+        "-b",
+        metavar="begin",
+        default="2021-02-15",
+        help="begin UTC date (YYYY-MM-DD)",
+    )
+    parser_compute.add_argument(
+        "-e",
+        metavar="end",
+        default="2021-02-28",
+        help="end UTC date (YYYY-MM-DD)",
+    )
+    parser_compute.add_argument(
+        "--data_dir",
+        metavar="dir",
+        help="data directory",
+        required=True,
+    )
+    parser_compute.add_argument(
+        "--all",
+        default=False,
+        const=True,
+        action="store_const",
+        help="if set, compute metrics for all data in the data director",
+    )
+    parser_compute.add_argument(
+        "--out",
+        metavar="out",
+        help="file to save output results",
+        required=True,
+    )
+    parser_compute.add_argument(
+        "--bid_ask_spread",
+        default=False,
+        const=True,
+        action="store_const",
+        help="if set, compute the bid-ask spread",
     )
 
     return parser
