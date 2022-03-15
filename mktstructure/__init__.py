@@ -1,4 +1,4 @@
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 __description__ = """Download data from Refinitiv Tick History and compute some market microstructure measures."""
 __author__ = "Mingze Gao"
 __author_email__ = "mingze.gao@sydney.edu.au"
