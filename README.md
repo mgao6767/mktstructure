@@ -4,11 +4,15 @@ A simple command-line tool to download data from Refinitiv Tick History and comp
 
 ## Installation
 
+You can install `mktstructure` via `pip`:
+
 ``` bash
 pip install mktstructure
 ```
 
-After installation, use `-h` or `--help` to see the usage instruction:
+## Quick Start
+
+Use `-h` or `--help` to see the usage instruction:
 
 ``` bash
 $ mktstructure -h
@@ -17,69 +21,57 @@ usage: mktstructure [OPTION]...
 Download data from Refinitiv Tick History and compute some market microstructure measures.
 
 optional arguments:
-  -h, --help       show this help message and exit
-  -v, --version    show program's version number and exit
-  -u user          DataScope username
-  -p password      DataScope password
-  -b begin         begin UTC date (YYYY-MM-DD)
-  -e end           end UTC date (YYYY-MM-DD)
-  -o out           output file path
-  --ric [RIC ...]  RIC of securities to process
-  --sp500          if set, process all S&P500 components (extending RIC list, if any)
-  --parse          if set, parse the downloaded raw data to output data directory
-  --data_dir dir   output data directory (used when --parse is set)
+  -h, --help            show this help message and exit
+  -v, --version         show program's version number and exit
+
+Sub-commands:
+  Choose one from the following. Use `mktstructure subcommand -h` to see help for each sub-command.
+
+  {download,clean,classify,compute}
+    download            Download data from Refinitiv Tick History
+    clean               Clean downloaded data
+    classify            Classify ticks into buy and sell orders
+    compute             Compute market microstructure measures
 ```
 
-## Usage examples
+### 1. Download data
 
-### Simple use cases
+Let's download the tick history for all S&P500 component stocks from Jan 1, 2022, to Jan 31, 2022:
 
-Download the tick history of Google from 2022-01-01 to 2022-02-01, saved as `out.csv.gz` in the current working directory:
-
-```bash
-mktstructure -u XXXXXX -p XXXXXX --ric GOOG.OQ -b 2022-01-01 -e 2022-02-01 -o out.csv.gz
+``` bash
+mktstructure download -u {username} -p {password} --sp500 --parse --data_dir "./data" -b 2022-01-01 -e 2022-01-31
 ```
 
-Download the tick history of Google and Apple from 2022-01-01 to 2022-02-01, saved as `out.csv.gz` in the current working directory:
+where `{username}` and `{password}` are the login credentials of Refinitiv DataScope Select.
 
-```bash
-mktstructure -u XXXXXX -p XXXXXX --ric GOOG.OQ AAPL.OQ -b 2022-01-01 -e 2022-02-01 -o out.csv.gz
+Note that we set the `--parse` flag to parse the downloaded data (gzip) into csv files by stock and date into the `./data` folder.
+
+### 2. Clean data
+
+Then we clean the downloaded and parsed data in the `./data` folder: sorting by time, removing duplicates, etc.
+
+``` bash
+mktstructure clean --all --data_dir "./data" --replace
 ```
 
-### Most common use case
+The ``--replace`` flag, if set, asks the program to replace the data file with the cleaned one to save disk space.
 
-Download the tick history of all S&P500 component stocks from 2022-01-01 to 2022-02-01, saved as `sp500.csv.gz` in the current working directory:
+### 3. Classify trade directions
 
-```bash
-mktstructure -u XXXXXX -p XXXXXX --sp500 -b 2022-01-01 -e 2022-02-01 -o sp500.csv.gz
+Use the `classify` subcommand to classify trades into buys and sells by the Lee and Ready (1991) algorithm.
+
+``` bash
+mktstructure classify --all --data_dir "./data"
 ```
 
-Or further, download and parse the downloaded data:
+### 4. Compute
 
-```bash
-mktstructure -u XXXXXX -p XXXXXX --sp500 -b 2022-01-01 -e 2022-02-01 -o sp500.csv.gz --parse --datadir "./data"
+Lastly, use the `compute` subcommand to compute specified market microstructure measures:
+
+``` bash
+mktstructure compute --all --data_dir "./data" --out bidaskspread.csv --bid_ask_spread
 ```
 
-After everything's completed, the daily tick history will be stored in `./data` folder as specified by the `--data_dir` option.
+## Note
 
-```powershell
-PS C:\Users\mgao\Documents\GitHub\mkt-microstructure> ls .\data\
-
-
-    Directory: C:\Users\mgao\Documents\GitHub\mkt-microstructure\data
-
-
-Mode                 LastWriteTime         Length Name
-----                 -------------         ------ ----
-d-----         6/03/2022   3:30 PM                A.N
-d-----         6/03/2022   3:30 PM                AAL.OQ
-d-----         6/03/2022   3:31 PM                AAP.N
-d-----         6/03/2022   3:31 PM                AAPL.OQ
-
-...
-
-d-----         6/03/2022   3:51 PM                ZBH.N
-d-----         6/03/2022   3:51 PM                ZBRA.OQ
-d-----         6/03/2022   3:51 PM                ZION.OQ
-d-----         6/03/2022   3:51 PM                ZTS.N
-```
+This tool is still a work in progress. Some breaking changes may be expected but will be kept minimal.
