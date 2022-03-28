@@ -44,21 +44,17 @@ def cmd_compute(args: argparse.Namespace):
                 df = pd.read_csv(path)
 
                 if args.bid_ask_spread:
-                    print(f"Computing bid-ask spread for {path}")
-                    result = measures.bidask_spread.estimate(df)
-                    print(
-                        format_result(date, ric, measures.bidask_spread.name, result),
-                        file=fout,
-                    )
-
+                    _compute(measures.bidask_spread, path, date, ric, df, fout)
                 if args.effective_spread:
-                    print(f"Computing effective spread for {path}")
-                    result = measures.effective_spread.estimate(df)
-                    print(
-                        format_result(
-                            date, ric, measures.effective_spread.name, result
-                        ),
-                        file=fout,
-                    )
+                    _compute(measures.effective_spread, path, date, ric, df, fout)
+                if args.realized_spread:
+                    _compute(measures.realized_spread, path, date, ric, df, fout)
 
     fout.close()
+
+
+def _compute(measure, path, date, ric, data, fout):
+    print(f"Computing {measure.name} for {path}")
+    result = measure.estimate(data)
+    result_formated = format_result(date, ric, measure.name, result)
+    print(result_formated, file=fout)
