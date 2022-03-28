@@ -45,9 +45,19 @@ def cmd_compute(args: argparse.Namespace):
 
                 if args.bid_ask_spread:
                     print(f"Computing bid-ask spread for {path}")
-                    result = measures.bidaskspread.estimate(df)
+                    result = measures.bidask_spread.estimate(df)
                     print(
-                        format_result(date, ric, measures.bidaskspread.name, result),
+                        format_result(date, ric, measures.bidask_spread.name, result),
+                        file=fout,
+                    )
+
+                if args.effective_spread:
+                    print(f"Computing effective spread for {path}")
+                    result = measures.effective_spread.estimate(df)
+                    print(
+                        format_result(
+                            date, ric, measures.effective_spread.name, result
+                        ),
                         file=fout,
                     )
 
