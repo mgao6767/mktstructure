@@ -49,6 +49,8 @@ def cmd_compute(args: argparse.Namespace):
                     _compute(measures.effective_spread, path, date, ric, df, fout)
                 if args.realized_spread:
                     _compute(measures.realized_spread, path, date, ric, df, fout)
+                if args.price_impact:
+                    _compute(measures.price_impact, path, date, ric, df, fout)
 
     fout.close()
 

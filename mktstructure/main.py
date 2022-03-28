@@ -231,6 +231,13 @@ def init_argparse() -> argparse.ArgumentParser:
         action="store_const",
         help="if set, compute the realized spread",
     )
+    parser_compute.add_argument(
+        "--price_impact",
+        default=False,
+        const=True,
+        action="store_const",
+        help="if set, compute the price impact",
+    )
 
     return parser
 
