@@ -8,7 +8,7 @@ from mktstructure import (
     __github_url__,
 )
 
-requires = ["requests", "numba", "pandas", "numpy"]
+requires = ["requests", "numba", "pandas", "numpy", "tqdm"]
 
 trth_parser = Extension(
     "mktstructure.trth_parser",

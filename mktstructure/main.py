@@ -1,6 +1,6 @@
 import argparse
+import os
 
-from numpy import require
 
 from mktstructure import __description__, __version__
 
@@ -144,6 +144,13 @@ def init_argparse() -> argparse.ArgumentParser:
         const=True,
         action="store_const",
         help="if set, replace raw data with cleaned data",
+    )
+    parser_clean.add_argument(
+        "-t",
+        "--threads",
+        metavar="threads",
+        help="number of workers to use",
+        default=os.cpu_count(),
     )
 
     # parser for `classify` subcommand
