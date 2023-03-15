@@ -149,6 +149,7 @@ def init_argparse() -> argparse.ArgumentParser:
         "-t",
         "--threads",
         metavar="threads",
+        type=int,
         help="number of workers to use",
         default=os.cpu_count(),
     )
