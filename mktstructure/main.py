@@ -186,6 +186,14 @@ def init_argparse() -> argparse.ArgumentParser:
         action="store_const",
         help="if set, classify all data in the data director",
     )
+    parser_classify.add_argument(
+        "-t",
+        "--threads",
+        metavar="threads",
+        type=int,
+        help="number of workers to use",
+        default=os.cpu_count(),
+    )
 
     # parser for `compute` subcommand
     parser_compute.add_argument(
