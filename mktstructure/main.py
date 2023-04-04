@@ -261,6 +261,13 @@ def init_argparse() -> argparse.ArgumentParser:
         action="store_const",
         help="if set, compute the price impact",
     )
+    parser_compute.add_argument(
+        "--variance_ratio",
+        default=False,
+        const=True,
+        action="store_const",
+        help="if set, compute the variance ratio and test statistics",
+    )
 
     return parser
 

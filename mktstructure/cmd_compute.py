@@ -28,8 +28,8 @@ def cmd_compute(args: argparse.Namespace):
             date = dt.fromisoformat(
                 date.removesuffix(".csv")
                 .removesuffix(".csv.gz")
-                .removesuffix(".sorted")
                 .removesuffix(".signed")
+                .removesuffix(".sorted")
             )
 
             # if `--all` flag is set
@@ -51,6 +51,8 @@ def cmd_compute(args: argparse.Namespace):
                     _compute(measures.realized_spread, path, date, ric, df, fout)
                 if args.price_impact:
                     _compute(measures.price_impact, path, date, ric, df, fout)
+                if args.variance_ratio:
+                    _compute(measures.variance_ratio, path, date, ric, df, fout)
 
     fout.close()
 
@@ -58,5 +60,13 @@ def cmd_compute(args: argparse.Namespace):
 def _compute(measure, path, date, ric, data, fout):
     print(f"Computing {measure.name} for {path}")
     result = measure.estimate(data)
-    result_formated = format_result(date, ric, measure.name, result)
-    print(result_formated, file=fout)
+    # Variance ratio test returns a list of results
+    if measure.name == "LoMacKinlay1988":
+        assert isinstance(result, list)
+        for res in result:
+            for k, v in res.items():
+                formated = format_result(date, ric, k, v)
+                print(formated, file=fout)
+    else:
+        result_formated = format_result(date, ric, measure.name, result)
+        print(result_formated, file=fout)
