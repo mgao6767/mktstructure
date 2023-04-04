@@ -72,7 +72,10 @@ def estimate(data):
     for k in [2, 4, 6, 8, 10, 15, 20]:
         # Compute a constant array as np.array creation is not allowed in nopython mode.
         const_arr = np.arange(k - 1, 0, step=-1, dtype=np.int)
-        vr, stat1, stat2 = _estimate(np.log(prices), k, const_arr)
+        try:
+            vr, stat1, stat2 = _estimate(np.log(prices), k, const_arr)
+        except ZeroDivisionError:
+            continue
         result.append(
             {
                 f"Variance Ratio (k={k})": vr,
