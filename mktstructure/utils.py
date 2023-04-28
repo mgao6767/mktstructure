@@ -4,7 +4,7 @@ from typing import List, Dict
 from numba import jit
 import pandas as pd
 import numpy as np
-from .request_templates import INDEX_COMPONENTS, INTRADAY_TICKS
+from .request_templates import INDEX_COMPONENTS, INTRADAY_TICKS, INTRADAY_MARKET_DEPTH
 
 
 SP500_RIC = "0#.SPX"
@@ -44,6 +44,16 @@ def make_request_index_components(mkt_index: List[str], date_start, date_end):
 
 def make_request_tick_history(rics: List[str], date_start, date_end):
     request = INTRADAY_TICKS.copy()
+    request["ExtractionRequest"]["IdentifierList"]["InstrumentIdentifiers"] = [
+        {"Identifier": ric, "IdentifierType": "Ric"} for ric in rics
+    ]
+    request["ExtractionRequest"]["Condition"]["QueryStartDate"] = date_start
+    request["ExtractionRequest"]["Condition"]["QueryEndDate"] = date_end
+    return request
+
+
+def make_request_tick_history_market_depth(rics: List[str], date_start, date_end):
+    request = INTRADAY_MARKET_DEPTH.copy()
     request["ExtractionRequest"]["IdentifierList"]["InstrumentIdentifiers"] = [
         {"Identifier": ric, "IdentifierType": "Ric"} for ric in rics
     ]

@@ -27,6 +27,11 @@ def init_argparse() -> argparse.ArgumentParser:
         description="Download data from Refinitiv Tick History",
         help="Download data from Refinitiv Tick History",
     )
+    parser_download_mktdepth = subparsers.add_parser(
+        "download_mktdepth",
+        description="Download market depth data from Refinitiv Tick History",
+        help="Download market depth data from Refinitiv Tick History",
+    )
     parser_clean = subparsers.add_parser(
         "clean",
         description="Clean the data in the data directory",
@@ -152,6 +157,69 @@ def init_argparse() -> argparse.ArgumentParser:
         type=int,
         help="number of workers to use",
         default=os.cpu_count(),
+    )
+
+    # subparser for `download_mktdepth` subcommand
+    parser_download_mktdepth.add_argument(
+        "-u",
+        metavar="user",
+        help="DataScope username",
+    )
+    parser_download_mktdepth.add_argument(
+        "-p",
+        metavar="password",
+        help="DataScope password",
+    )
+    parser_download_mktdepth.add_argument(
+        "-b",
+        metavar="begin",
+        default="2021-02-15",
+        help="begin UTC date (YYYY-MM-DD)",
+    )
+    parser_download_mktdepth.add_argument(
+        "-e",
+        metavar="end",
+        default="2021-02-28",
+        help="end UTC date (YYYY-MM-DD)",
+    )
+    parser_download_mktdepth.add_argument(
+        "-o",
+        metavar="out",
+        default="out.csv.gz",
+        help="output file path",
+    )
+    parser_download_mktdepth.add_argument(
+        "--ric",
+        nargs="*",
+        default=[],
+        help="RIC of securities to process",
+    )
+    parser_download_mktdepth.add_argument(
+        "--sp500",
+        default=False,
+        const=True,
+        action="store_const",
+        help="if set, process all S&P500 components (extending RIC list, if any)",
+    )
+    parser_download_mktdepth.add_argument(
+        "--parse",
+        default=False,
+        const=True,
+        action="store_const",
+        help="if set, parse the downloaded raw data to output data directory",
+    )
+    parser_download_mktdepth.add_argument(
+        "--data_dir",
+        metavar="dir",
+        default="./data",
+        help="output data directory (used when --parse is set)",
+    )
+    parser_download_mktdepth.add_argument(
+        "--compress",
+        default=False,
+        const=True,
+        action="store_const",
+        help="if set, compress parsed data (effective only when --parse is set)",
     )
 
     # parser for `classify` subcommand
@@ -280,6 +348,11 @@ def main():
         from .cmd_download import cmd_download
 
         cmd_download(args)
+
+    if args.command == "download_mktdepth":
+        from .cmd_download_mktdepth import cmd_download_mktdepth
+
+        cmd_download_mktdepth(args)
 
     if args.command == "clean":
         from .cmd_clean import cmd_clean

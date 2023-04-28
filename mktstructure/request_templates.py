@@ -8,6 +8,37 @@ INDEX_COMPONENTS = {
     }
 }
 
+INTRADAY_MARKET_DEPTH = {
+    "ExtractionRequest": {
+        "@odata.type": "#DataScope.Select.Api.Extractions.ExtractionRequests.TickHistoryMarketDepthExtractionRequest",
+        "ContentFieldNames": [
+            "Ask Price",
+            "Ask Size",
+            "Bid Price",
+            "Bid Size",
+            "Exchange Time",
+            "Number of Buyers",
+            "Number of Sellers",
+        ],
+        "IdentifierList": {
+            "@odata.type": "#DataScope.Select.Api.Extractions.ExtractionRequests.InstrumentIdentifierList",
+            "InstrumentIdentifiers": [
+                {"Identifier": "AAPL.OQ", "IdentifierType": "Ric"}
+            ],
+            "UseUserPreferencesForValidationOptions": "False",
+        },
+        "Condition": {
+            "View": "NormalizedLL2",
+            "NumberOfLevels": 5,
+            "MessageTimeStampIn": "GmtUtc",
+            "ReportDateRangeType": "Range",
+            "QueryStartDate": "2020-03-01T00:00:00.000Z",
+            "QueryEndDate": "2020-03-03T00:00:00.000Z",
+            "DisplaySourceRIC": "False",
+        },
+    }
+}
+
 INTRADAY_TICKS = {
     "ExtractionRequest": {
         "@odata.type": "#DataScope.Select.Api.Extractions.ExtractionRequests.TickHistoryTimeAndSalesExtractionRequest",
