@@ -16,7 +16,7 @@ vars_needed = {"Price", "Volume", "Mid Point", "Direction"}
 
 
 def estimate(data: pd.DataFrame) -> np.ndarray:
-    log_midpt = np.log(data["Mid Point"].to_numpy())
+    midpt = data["Mid Point"].to_numpy()
     price = data["Price"].to_numpy()
     timestamps = np.array(data.index, dtype="datetime64")
     # Find the Quote Mid Point 5 min later than each trade.
@@ -24,7 +24,7 @@ def estimate(data: pd.DataFrame) -> np.ndarray:
     for idx, ts1 in enumerate(timestamps):
         for i, ts2 in enumerate(timestamps[idx:]):
             if ts2 - ts1 >= np.timedelta64(5, "m"):
-                matched_midpt.append(log_midpt[idx + i])
+                matched_midpt.append(midpt[idx + i])
                 break
     matched = len(matched_midpt)
     rspread = (
