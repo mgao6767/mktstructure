@@ -24,7 +24,7 @@ def cmd_download_mktdepth(args: argparse.Namespace):
             )
         )
 
-    data = trth.get_table(args.ric, start_date, end_date)
+    data = trth.get_table_mktdepth(args.ric, start_date, end_date)
 
     print(f"Saving data to {args.o}...")
 

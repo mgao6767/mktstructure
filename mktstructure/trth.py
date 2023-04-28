@@ -1,7 +1,11 @@
 import requests
 import time
 
-from .utils import make_request_index_components, make_request_tick_history
+from .utils import (
+    make_request_index_components,
+    make_request_tick_history,
+    make_request_tick_history_market_depth,
+)
 
 # URL_BASE = "https://hosted.datascopeapi.reuters.com/RestApi/v1"
 URL_BASE = "https://selectapi.datascope.refinitiv.com/RestApi/v1"
@@ -43,6 +47,10 @@ class Connection:
 
     def get_table(self, rics, start_date, end_date):
         req = make_request_tick_history(rics, start_date, end_date)
+        return self.extract_raw(req)
+
+    def get_table_mktdepth(self, rics, start_date, end_date):
+        req = make_request_tick_history_market_depth(rics, start_date, end_date)
         return self.extract_raw(req)
 
     def _getAccessToken(self) -> str:
