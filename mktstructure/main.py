@@ -336,6 +336,34 @@ def init_argparse() -> argparse.ArgumentParser:
         action="store_const",
         help="if set, compute the variance ratio and test statistics",
     )
+    parser_compute.add_argument(
+        "--bid_slope",
+        default=False,
+        const=True,
+        action="store_const",
+        help="if set, compute the bid slope",
+    )
+    parser_compute.add_argument(
+        "--ask_slope",
+        default=False,
+        const=True,
+        action="store_const",
+        help="if set, compute the ask slope",
+    )
+    parser_compute.add_argument(
+        "--scaled_depth_diff_1",
+        default=False,
+        const=True,
+        action="store_const",
+        help="if set, compute the scaled depth difference at the 1st level",
+    )
+    parser_compute.add_argument(
+        "--scaled_depth_diff_5",
+        default=False,
+        const=True,
+        action="store_const",
+        help="if set, compute the scaled depth difference at the 5th level",
+    )
 
     return parser
 

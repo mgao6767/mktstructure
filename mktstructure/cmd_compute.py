@@ -20,8 +20,16 @@ def cmd_compute(args: argparse.Namespace):
         for f in files:
             # skip those unsigned ones
             # TODO: .csv vs .csv.gz
-            if "signed" not in f:
+            if ".csv" not in f:
                 continue
+            if not (
+                args.bid_slope
+                or args.ask_slope
+                or args.scaled_depth_diff_1
+                or args.scaled_depth_diff_5
+            ):
+                if "signed" not in f:
+                    continue
 
             path = os.path.join(root, f)
             ric, date = os.path.normpath(path).split(os.sep)[-2:]
@@ -53,6 +61,14 @@ def cmd_compute(args: argparse.Namespace):
                     _compute(measures.price_impact, path, date, ric, df, fout)
                 if args.variance_ratio:
                     _compute(measures.variance_ratio, path, date, ric, df, fout)
+                if args.bid_slope:
+                    _compute(measures.bid_slope, path, date, ric, df, fout)
+                if args.ask_slope:
+                    _compute(measures.ask_slope, path, date, ric, df, fout)
+                if args.scaled_depth_diff_1:
+                    _compute(measures.sdd1, path, date, ric, df, fout)
+                if args.scaled_depth_diff_5:
+                    _compute(measures.sdd5, path, date, ric, df, fout)
 
     fout.close()
 
