@@ -1,17 +1,50 @@
 import argparse
 import os
 from datetime import datetime as dt
-
+from functools import partial
 import pandas as pd
 
 from . import measures
+from .parx import parx
+from .utils import process_files
 
 
 def format_result(date, ric, measure_name, result):
-    return ",".join([date.strftime("%Y-%m-%d"), ric, measure_name, str(result)])
+    return ",".join([date, ric, measure_name, str(result)])
+
+
+def afunc(func, params):
+    ric, date, path = params
+    df = pd.read_csv(path)
+    return func(df)
+
+
+def compute(measure, data):
+    results = parx(partial(afunc, measure.estimate), data)
+    for res, (ric, date, _) in zip(results, data):
+        print(ric, date, measure.name, res)
 
 
 def cmd_compute(args: argparse.Namespace):
+
+    # Filter files to work on
+    files = process_files(args.data_dir, file_pattern="*.signed.csv.gz")
+    if not args.all:
+        bdate = dt.fromisoformat(args.b)
+        edate = dt.fromisoformat(args.e)
+        files = [
+            (ric, date, file_path) for ric, date, file_path in files
+            if ric in args.ric and bdate <= dt.fromisoformat(date) <= edate]
+
+    if args.bid_ask_spread:
+        compute(measures.bidask_spread, files)
+
+    # Execute
+    with open(args.out, "w", encoding="utf-8") as fout:
+        pass
+
+
+def cmd_compute_old(args: argparse.Namespace):
 
     if args.out:
         fout = open(args.out, "w")
@@ -54,13 +87,16 @@ def cmd_compute(args: argparse.Namespace):
                 if args.bid_ask_spread:
                     _compute(measures.bidask_spread, path, date, ric, df, fout)
                 if args.effective_spread:
-                    _compute(measures.effective_spread, path, date, ric, df, fout)
+                    _compute(measures.effective_spread,
+                             path, date, ric, df, fout)
                 if args.realized_spread:
-                    _compute(measures.realized_spread, path, date, ric, df, fout)
+                    _compute(measures.realized_spread,
+                             path, date, ric, df, fout)
                 if args.price_impact:
                     _compute(measures.price_impact, path, date, ric, df, fout)
                 if args.variance_ratio:
-                    _compute(measures.variance_ratio, path, date, ric, df, fout)
+                    _compute(measures.variance_ratio,
+                             path, date, ric, df, fout)
                 if args.bid_slope:
                     _compute(measures.bid_slope, path, date, ric, df, fout)
                 if args.ask_slope:
