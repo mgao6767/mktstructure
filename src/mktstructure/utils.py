@@ -1,6 +1,10 @@
 import os
+import glob
+import gzip
+import shutil
+from datetime import datetime, date
 import json
-from typing import List, Dict
+from typing import List, Dict, Tuple
 from numba import jit
 import pandas as pd
 import numpy as np
@@ -164,3 +168,89 @@ def _sort_and_rm_duplicates(data_path, replace=True):
         compression="gzip" if gz else "infer",
         mode="w",
     )
+
+
+def process_files(data_folder: str, file_pattern="*.signed.csv") -> List[Tuple[str, str, str]]:
+    """
+    Processes files in a given data folder, extracting the RIC, date, and file path for each .csv.gz file.
+
+    Args:
+        data_folder (str): The path to the data folder containing subdirectories named after RIC codes.
+        file_pattern (str): The file pattern to match. Defaults to "*.signed.csv".
+
+    Returns:
+        List[Tuple[str, str, str]]: A list of tuples, each containing the RIC code, date, and file path.
+    """
+    # This will hold the result
+    result = []
+
+    # Iterate over all subdirectories in the data_folder
+    for ric_folder in os.listdir(data_folder):
+        ric_folder_path = os.path.join(data_folder, ric_folder)
+
+        # Check if it's a directory
+        if os.path.isdir(ric_folder_path):
+            # Use glob to find all .csv.gz files in this directory
+            for file_path in glob.glob(os.path.join(ric_folder_path, file_pattern)):
+                # Extract the date from the file name
+                file_name = os.path.basename(file_path)
+                date_str = file_name.split('.')[0]
+                try:
+                    # Check if the date string is valid
+                    date_obj = datetime.strptime(date_str, "%Y-%m-%d").date()
+                    date_str = date_obj.isoformat()
+                    # Add the RIC, date, and path to the result
+                    result.append((ric_folder, date_str, file_path))
+                except ValueError:
+                    # If the date is not valid, skip this file
+                    continue
+
+    return result
+
+
+def gzip_file(file_path: str):
+    """
+    Compresses a file using gzip and stores it in the same folder.
+
+    Args:
+        file_path (str): The path of the file to be compressed.
+    """
+    compressed_file_path = file_path + '.gz'
+
+    with open(file_path, 'rb') as f_in:
+        with gzip.open(compressed_file_path, 'wb') as f_out:
+            shutil.copyfileobj(f_in, f_out)
+
+    print(f"Compressed file stored at {compressed_file_path}")
+
+
+def read_gzipped_file(file_path: str) -> str:
+    """
+    Reads the content of a gzipped file and returns it.
+
+    Args:
+        file_path (str): The path of the gzipped file to be read.
+
+    Returns:
+        str: The content of the gzipped file.
+    """
+    try:
+        with gzip.open(file_path, 'rt') as f:
+            return f.read()
+    except OSError as e:
+        print(f"Error: {e.strerror}. Could not read file {file_path}.")
+        return ""
+
+
+def delete_file(file_path: str):
+    """
+    Deletes a file specified by the file path.
+
+    Args:
+        file_path (str): The path of the file to be deleted.
+    """
+    try:
+        os.remove(file_path)
+        print(f"File {file_path} has been deleted.")
+    except OSError as e:
+        print(f"Error: {e.strerror}. File {file_path} could not be deleted.")
