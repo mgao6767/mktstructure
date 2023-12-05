@@ -1,0 +1,36 @@
+[project]
+name = "mktstructure"
+version = "1.0.0rc1"
+authors = [{ name = "Mingze Gao", email = "adrian.gao@outlook.com" }]
+description = "Download data from Refinitiv Tick History and compute some market microstructure measures"
+readme = "README.md"
+requires-python = ">=3.10"
+classifiers = [
+  "Operating System :: OS Independent",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Intended Audience :: End Users/Desktop",
+  "Intended Audience :: Financial and Insurance Industry",
+  "Intended Audience :: Education",
+  "Intended Audience :: Science/Research",
+  "Topic :: Scientific/Engineering :: Information Analysis",
+]
+license = { text = "MIT License" }
+dependencies = ["requests", "numba", "pandas", "numpy", "tqdm", "frds"]
+
+
+[project.urls]
+homepage = "https://github.com/mgao6767/mktstructure"
+
+[build-system]
+requires = ["setuptools", "numpy"]
+build-backend = "setuptools.build_meta"
+
+[tool.cibuildwheel]
+skip = ["pp*", "*i686"]
+
+[project.scripts]
+mktstructure = "mktstructure.main:main"

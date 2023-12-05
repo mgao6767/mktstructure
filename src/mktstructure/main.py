@@ -1,9 +1,10 @@
 import argparse
 import os
 
+import pkg_resources
 
-from mktstructure import __description__, __version__
-
+__version__ = pkg_resources.get_distribution("mktstructure").version
+__description__ = "Download data from Refinitiv Tick History and compute some market microstructure measures"
 
 def init_argparse() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
