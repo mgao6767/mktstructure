@@ -303,11 +303,11 @@ def init_argparse() -> argparse.ArgumentParser:
         required=True,
     )
     parser_compute.add_argument(
-        "--bid_ask_spread",
+        "--quoted_spread",
         default=False,
         const=True,
         action="store_const",
-        help="if set, compute the bid-ask spread",
+        help="if set, compute the quoted spread",
     )
     parser_compute.add_argument(
         "--effective_spread",

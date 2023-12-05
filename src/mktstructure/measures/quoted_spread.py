@@ -3,8 +3,8 @@ import pandas as pd
 
 from .exceptions import *
 
-name = "BidAskSpread"
-description = "Simple average bid-ask spread"
+name = "QuotedSpread"
+description = "Simple average quoted bid-ask spread"
 vars_needed = {"Bid Price", "Ask Price", "Mid Point"}
 
 
