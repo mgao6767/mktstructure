@@ -4,18 +4,6 @@ from numba import jit
 
 
 def lee_and_ready(df: pd.DataFrame) -> pd.DataFrame:
-    # Convert to pd.DatetimeIndex to preserve nanoseconds.
-    df["Date-Time"] = pd.DatetimeIndex(df["Date-Time"])
-    # Get GMT Offset
-    offset = np.timedelta64(df["GMT Offset"].iloc[0], "h")
-    # Convert from GMTUTC to local time.
-    df["Date-Time"] = df["Date-Time"] + offset
-    # Set local time as index.
-    df.set_index("Date-Time", inplace=True)
-    # Keep only trades/quotes during normal trading hours.
-    # TODO: Check RIC and get trading hours for non US exchanges.
-    # without `.copy()` there is hidden chaining causing `SettingSettingWithCopyWarning` warning
-    df = df.between_time(start_time="09:30", end_time="16:00").copy()
     # Prepare for Lee and Ready.
     prices = df["Price"].to_numpy()
     bids = df["Bid Price"].to_numpy()

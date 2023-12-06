@@ -1,59 +1,30 @@
 import argparse
-import os
-from datetime import datetime as dt
-from concurrent.futures import as_completed, ProcessPoolExecutor
-import tqdm
 import pandas as pd
 
-from .utils import lee_and_ready
+from .parx import parx
+from .lee_ready import lee_and_ready
+from .utils import process_files, filter_quotes, transform_taq
 
 
 def classify(path):
-    for root, _, files in os.walk(path):
-        for f in files:
-            # skip those signed ones
-            if "signed" in f:
-                continue
-            # work on only sorted files
-            if not ".sorted.csv.gz" in f:
-                continue
-            p = os.path.join(root, f)
+    df = pd.read_csv(path)
+    df = transform_taq(df)
 
-            if os.path.isfile(p):
-                df = pd.read_csv(p)
-                df_signed = lee_and_ready(df)
-                df_signed.to_csv(p.replace(".csv", ".signed.csv"))
+    df_signed = lee_and_ready(df)
+    df_signed.to_csv(path.replace(".sorted.csv.gz",
+                     ".signed-trades.csv.gz"), compression="gzip")
+
+    df_quotes = filter_quotes(df)
+    df_quotes.to_csv(path.replace(".sorted.csv.gz",
+                     ".quotes.csv.gz"), compression="gzip")
 
 
 def cmd_classify(args: argparse.Namespace):
-    if args.all:
-        _, rics, _ = next(os.walk(args.data_dir))
-        workers = min(os.cpu_count(), args.threads)
-        progress = tqdm.tqdm(total=len(rics))
-        with ProcessPoolExecutor(workers) as exe:
-            fs = [
-                exe.submit(classify, os.path.join(args.data_dir, ric)) for ric in rics
-            ]
-            for _ in as_completed(fs):
-                progress.update()
-    else:
-        # if `--all` flag is set
-        for root, _, files in os.walk(args.data_dir):
-            for f in files:
-                if "signed" in f:
-                    continue
-                if not ".sorted.csv.gz" in f:
-                    continue
-
-                path = os.path.join(root, f)
-                ric, date = os.path.normpath(path).split(os.sep)[-2:]
-
-                if ric not in args.ric:
-                    continue
-                date = dt.fromisoformat(
-                    date.removesuffix(".csv")
-                    .removesuffix(".csv.gz")
-                    .removesuffix(".sorted")
-                )
-                if not (dt.fromisoformat(args.b) <= date <= dt.fromisoformat(args.e)):
-                    continue
+    """
+    Classify trade directions on the sorted data.
+    Create "2020-01-01.signed-trades.csv.gz" in the same folder.
+    Also create quotes.
+    """
+    files = process_files(
+        args.data_dir, file_pattern="????-??-??.sorted.csv.gz")
+    parx(classify, [path for _, _, path in files], workers=args.threads)

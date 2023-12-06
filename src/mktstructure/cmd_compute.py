@@ -6,7 +6,7 @@ import pandas as pd
 
 from . import measures
 from .parx import parx
-from .utils import process_files
+from .utils import process_files, transform_taq
 
 
 def format_result(date, ric, measure_name, result):
@@ -16,26 +16,30 @@ def format_result(date, ric, measure_name, result):
 def afunc(func, params):
     ric, date, path = params
     df = pd.read_csv(path)
+    df = transform_taq(df)
     return func(df)
 
 
-def _compute(measure, data, *func_args, out_filepath="results.csv", **func_kwargs):
+def _compute(measure, data, out_filepath="results.csv"):
     assert hasattr(measure, "estimate")
     assert isinstance(measure.estimate, Callable)
     results = parx(partial(afunc, measure.estimate), data)
 
     with open(out_filepath, "w", encoding="utf-8") as fout:
         for res, (ric, date, _) in zip(results, data):
-            # Variance ratio test returns a list of results
-            if measure.name == "LoMacKinlay1988":
-                assert isinstance(res, list)
-                for r in res:
-                    for k, v in r.items():
-                        formated = format_result(date, ric, k, v)
-                        print(formated, file=fout)
-            else:
-                result_formated = format_result(date, ric, measure.name, res)
-                print(result_formated, file=fout)
+            assert isinstance(res, dict)
+            for name, value in res.items():
+                print(format_result(date, ric, name, value), file=fout)
+            # # Variance ratio test returns a list of results
+            # if measure.name == "LoMacKinlay1988":
+            #     assert isinstance(res, list)
+            #     for r in res:
+            #         for k, v in r.items():
+            #             formated = format_result(date, ric, k, v)
+            #             print(formated, file=fout)
+            # else:
+            #     result_formated = format_result(date, ric, measure.name, res)
+            #     print(result_formated, file=fout)
 
 
 def get_trades_and_quotes(args: argparse.Namespace):
@@ -46,6 +50,10 @@ def get_trades_and_quotes(args: argparse.Namespace):
     filters and returns signed trades and quotes based on a given set of 
     criteria. The criteria include the type of files to process, a date range, 
     and specific RICs (Reuters Instrument Codes).
+
+    Here, we assume that the TAQ data has been sorted.
+    "*.signed-trades.csv.gz" contains signed trades and corresponding quotes.
+    "*.quotes.csv.gz" contains quotes only.
 
     Parameters:
     args (argparse.Namespace): A namespace object from argparse containing 
@@ -90,6 +98,7 @@ def cmd_compute(args: argparse.Namespace):
     # quoted-spread based on quotes not trades
     if args.quoted_spread:
         compute(measures.quoted_spread, quotes)
+
     # others use signed trades (and quotes)
     if args.effective_spread:
         compute(measures.effective_spread, signed_trades)
@@ -99,6 +108,8 @@ def cmd_compute(args: argparse.Namespace):
         compute(measures.price_impact, signed_trades)
     if args.variance_ratio:
         compute(measures.variance_ratio, signed_trades)
+
+    # These use LOB data
     if args.bid_slope:
         compute(measures.bid_slope, signed_trades)
     if args.ask_slope:

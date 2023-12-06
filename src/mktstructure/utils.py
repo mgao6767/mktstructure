@@ -65,7 +65,7 @@ def make_request_tick_history_market_depth(rics: List[str], date_start, date_end
     return request
 
 
-def filter_quotes(df: pd.DataFrame) -> pd.DataFrame:
+def transform_taq(df: pd.DataFrame) -> pd.DataFrame:
     # Convert to pd.DatetimeIndex to preserve nanoseconds.
     df["Date-Time"] = pd.DatetimeIndex(df["Date-Time"])
     # Get GMT Offset
@@ -77,7 +77,10 @@ def filter_quotes(df: pd.DataFrame) -> pd.DataFrame:
     # Keep only trades/quotes during normal trading hours.
     # TODO: Check RIC and get trading hours for non US exchanges.
     # without `.copy()` there is hidden chaining causing `SettingSettingWithCopyWarning` warning
-    df = df.between_time(start_time="09:30", end_time="16:00").copy()
+    return df.between_time(start_time="09:30", end_time="16:00").copy()
+
+
+def filter_quotes(df: pd.DataFrame) -> pd.DataFrame:
     return df[df["Type"] == "Quote"]
 
 
@@ -86,14 +89,8 @@ def _sort_and_rm_duplicates(data_path, replace=True):
     Remove trades/quotes with same Bid/Ask/Volume/Price at the same nanosecond.
     It is highly unlikely that two quotes/trades of exactly the same parameters happen at the same nanosecond.
     """
-    if "gz" in data_path:
-        gz = True
-        # Parse_dates here will result in loss of nanosecond precision!
-        df = pd.read_csv(data_path, compression="gzip")
-    else:
-        gz = False
-        df = pd.read_csv(data_path)
-
+    # Parse_dates here will result in loss of nanosecond precision!
+    df = pd.read_csv(data_path)
     # obs = len(df.index)
     # Drop duplicates first before converting Date-Time to DatetimeIndex, otherwise it'll be ignored.
     # https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.drop_duplicates.html
@@ -105,7 +102,7 @@ def _sort_and_rm_duplicates(data_path, replace=True):
     # new_len = len(df.index)
     df.to_csv(
         data_path if replace else f"{data_path.replace('.csv', '.sorted.csv')}",
-        compression="gzip" if gz else "infer",
+        compression="gzip",
         mode="w",
     )
 

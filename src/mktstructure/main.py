@@ -6,6 +6,7 @@ import pkg_resources
 __version__ = pkg_resources.get_distribution("mktstructure").version
 __description__ = "Download data from Refinitiv Tick History and compute some market microstructure measures"
 
+
 def init_argparse() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         usage="%(prog)s [OPTION]...",
@@ -114,35 +115,10 @@ def init_argparse() -> argparse.ArgumentParser:
 
     # parser for `clean` subcommand
     parser_clean.add_argument(
-        "--ric",
-        nargs="*",
-        default=[],
-        help="RIC of securities to clean",
-    )
-    parser_clean.add_argument(
-        "-b",
-        metavar="begin",
-        default="2021-02-15",
-        help="begin UTC date (YYYY-MM-DD)",
-    )
-    parser_clean.add_argument(
-        "-e",
-        metavar="end",
-        default="2021-02-28",
-        help="end UTC date (YYYY-MM-DD)",
-    )
-    parser_clean.add_argument(
         "--data_dir",
         metavar="dir",
         help="data directory",
         required=True,
-    )
-    parser_clean.add_argument(
-        "--all",
-        default=False,
-        const=True,
-        action="store_const",
-        help="if set, clean all data in the data director",
     )
     parser_clean.add_argument(
         "--replace",
@@ -225,35 +201,10 @@ def init_argparse() -> argparse.ArgumentParser:
 
     # parser for `classify` subcommand
     parser_classify.add_argument(
-        "--ric",
-        nargs="*",
-        default=[],
-        help="RIC of securities to clean",
-    )
-    parser_classify.add_argument(
-        "-b",
-        metavar="begin",
-        default="2021-02-15",
-        help="begin UTC date (YYYY-MM-DD)",
-    )
-    parser_classify.add_argument(
-        "-e",
-        metavar="end",
-        default="2021-02-28",
-        help="end UTC date (YYYY-MM-DD)",
-    )
-    parser_classify.add_argument(
         "--data_dir",
         metavar="dir",
         help="data directory",
         required=True,
-    )
-    parser_classify.add_argument(
-        "--all",
-        default=False,
-        const=True,
-        action="store_const",
-        help="if set, classify all data in the data director",
     )
     parser_classify.add_argument(
         "-t",
