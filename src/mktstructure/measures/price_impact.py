@@ -1,3 +1,4 @@
+from typing import Dict
 import numpy as np
 import pandas as pd
 
@@ -8,7 +9,7 @@ name = "PriceImpact"
 vars_needed = {"Price", "Volume", "Mid Point", "Direction"}
 
 
-def estimate(data: pd.DataFrame) -> np.ndarray:
+def estimate(data: pd.DataFrame) -> Dict[str, float]:
     if not vars_needed.issubset(data.columns):
         raise MissingVariableError(name, vars_needed.difference(data.columns))
 
