@@ -1,4 +1,4 @@
-import numpy as np
+from typing import Dict
 import pandas as pd
 
 from frds.measures.spread import effective_spread
@@ -9,7 +9,7 @@ name = "EffectiveSpread"
 vars_needed = {"Price", "Volume", "Mid Point", "Direction"}
 
 
-def estimate(data: pd.DataFrame) -> np.ndarray:
+def estimate(data: pd.DataFrame) -> Dict[str, float]:
     if not vars_needed.issubset(data.columns):
         raise MissingVariableError(name, vars_needed.difference(data.columns))
 
@@ -18,4 +18,5 @@ def estimate(data: pd.DataFrame) -> np.ndarray:
     direction = data["Direction"].to_numpy()
     volume = data["Volume"].to_numpy()
 
-    return effective_spread(price, midpt, volume, direction, pct_spread=True)
+    return {name+"WithDirection": effective_spread(price, midpt, volume, direction, pct_spread=True),
+            name+"AbsoluteVal": effective_spread(price, midpt, volume, trade_direction=None, pct_spread=True)}
