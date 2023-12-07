@@ -4,8 +4,10 @@ import os
 from shutil import copyfileobj
 
 from .utils import extract_index_components_ric
+from .utils import delete_file, process_files, gzip_file
 from .utils import SP500_RIC, NASDAQ_RIC, NYSE_RIC
 from .trth import Connection
+from .trth_parser import parse_to_data_dir
 
 
 def cmd_download_mktdepth(args: argparse.Namespace):
@@ -31,3 +33,21 @@ def cmd_download_mktdepth(args: argparse.Namespace):
     trth.save_results(data, args.o)
 
     print("Downloading finished.")
+
+    if args.parse:
+
+        print("Decompressing downloaded data.")
+        with gzip.open(args.o, "rb") as fin, open("__tmp.csv", "wb") as fout:
+            copyfileobj(fin, fout)
+
+        print("Parsing downloaded raw data.")
+        parse_to_data_dir("__tmp.csv", args.data_dir, "1")
+
+        os.remove("__tmp.csv")
+
+        if args.compress:
+
+            print("Compressing parsed data.")
+            for ric, date, path in process_files(args.data_dir, file_pattern="????-??-??.csv"):
+                gzip_file(path)
+                delete_file(path)
