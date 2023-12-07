@@ -23,8 +23,8 @@
 // The expected number of transactions for a security in a day
 // This needs to be dynamically managed.
 #define CHUNK_LENGTH 10000000
-#define FOR_EACH_TOKEN(CTX, I, S, D)                         \
-  for (CTX = (S), (I) = get_next_token(&(CTX), D); (I) != 0; \
+#define FOR_EACH_TOKEN(CTX, I, S, D)                                           \
+  for (CTX = (S), (I) = get_next_token(&(CTX), D); (I) != 0;                   \
        (I) = get_next_token(&(CTX), D))
 
 char *get_local_date(char *datetimeISO, int GMT_offset);
@@ -52,7 +52,8 @@ struct Fields {
 
 // Extract meta info from the file.
 struct Fields *get_meta_info(FILE *file, int close_after_read) {
-  if (file == NULL) exit(EXIT_FAILURE);
+  if (file == NULL)
+    exit(EXIT_FAILURE);
   // Init a buffer
   static char buffer[BUFSIZE];
   // Read first line from the file.
@@ -64,12 +65,14 @@ struct Fields *get_meta_info(FILE *file, int close_after_read) {
   FOR_EACH_TOKEN(context, field, buffer, ",") {
     if (strcmp(field, FIELD_DATETIME) == 0)
       meta->locFieldDateTime = meta->lengthOfFields;
-    if (strcmp(field, FIELD_RIC) == 0) meta->locFieldRIC = meta->lengthOfFields;
+    if (strcmp(field, FIELD_RIC) == 0)
+      meta->locFieldRIC = meta->lengthOfFields;
     if (strcmp(field, FIELD_GMTOFFSET) == 0)
       meta->locFieldGMTOffset = meta->lengthOfFields;
     meta->lengthOfFields++;
   }
-  if (close_after_read) fclose(file);
+  if (close_after_read)
+    fclose(file);
 #if DEBUG_DETAIL
   printf("meta->locFieldRIC %d\n", meta->locFieldRIC);
   printf("meta->locFieldDateTime %d\n", meta->locFieldDateTime);
@@ -97,7 +100,8 @@ int main(int argc, char const *argv[]) {
     return EXIT_FAILURE;
 
   FILE *file = fopen(input, "r");
-  if (file == NULL) exit(EXIT_FAILURE);
+  if (file == NULL)
+    exit(EXIT_FAILURE);
 
   // Get meta info.
   struct Fields *meta = get_meta_info(file, 0);
@@ -118,7 +122,8 @@ int main(int argc, char const *argv[]) {
 // Process the data part of the file.
 void process(FILE *file, struct Fields *meta, const char *output_dir,
              int replace) {
-  if (file == NULL) exit(EXIT_FAILURE);
+  if (file == NULL)
+    exit(EXIT_FAILURE);
   // Init a buffer, context and field pointers.
   static char buffer[BUFSIZE];
   // Keep track of last RIC and local date.
@@ -156,7 +161,8 @@ void process(FILE *file, struct Fields *meta, const char *output_dir,
       }
       loc++;
       // Break parsing the row when all identifiers are found.
-      if (identifiers_found == 3) break;
+      if (identifiers_found == 3)
+        break;
     }
     // Compute local date.
     thisLocalDate = get_local_date(thisDateTime, atoi(thisGMTOffset));
@@ -218,7 +224,7 @@ void process(FILE *file, struct Fields *meta, const char *output_dir,
   // Case 1: the file contains only one RIC and one local date.
   // Case 2: the last valid chunk.
   if (numTransactions > 0)
-    save_chunk(thisRIC, thisLocalDate, meta->fields, chunk, numTransactions,
+    save_chunk(lastRIC, lastLocalDate, meta->fields, chunk, numTransactions,
                output_dir, replace);
 
   // Free chunk.
@@ -285,7 +291,8 @@ int save_chunk(char *RIC, char *local_date, const char *fields, char **chunk,
     // File exists.
     outputFile = fopen(output_file, mode);
     // Write header row if file exists but we're to overwrite it.
-    if (replace == 1) fprintf(outputFile, "%s", fields);
+    if (replace == 1)
+      fprintf(outputFile, "%s", fields);
   } else {
     // File doesn't exist. Write header row.
     outputFile = fopen(output_file, mode);
@@ -307,7 +314,8 @@ char *get_next_token(char **context, const char *delim) {
   char *ret;
 
   /* A null context indicates no more tokens. */
-  if (*context == 0) return 0;
+  if (*context == 0)
+    return 0;
 
   /* Skip delimiters to find start of token */
   ret = (*context += strspn(*context, delim));
