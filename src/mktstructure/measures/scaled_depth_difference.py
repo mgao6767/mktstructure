@@ -1,21 +1,21 @@
 import numpy as np
 import pandas as pd
 
+from frds.measures.lob_slope import DGGW_scaled_depth_difference
 from .exceptions import *
 
 name = "ScaledDepthDifference"
-description = "Scaled Depth Difference to examine the relative level of asymmetry in the order book at a particular point in time"
 vars_needed = {
-    "L1-BidPrice",
-    "L2-BidPrice",
-    "L3-BidPrice",
-    "L4-BidPrice",
-    "L5-BidPrice",
-    "L1-AskPrice",
-    "L2-AskPrice",
-    "L3-AskPrice",
-    "L4-AskPrice",
-    "L5-AskPrice",
+    "L1-BidSize",
+    "L2-BidSize",
+    "L3-BidSize",
+    "L4-BidSize",
+    "L5-BidSize",
+    "L1-AskSize",
+    "L2-AskSize",
+    "L3-AskSize",
+    "L4-AskSize",
+    "L5-AskSize",
 }
 
 
@@ -25,9 +25,14 @@ def estimate(data: pd.DataFrame, level=1) -> np.ndarray:
 
     data = data.dropna(subset=vars_needed)
 
-    slope = np.divide(
-        data[f"L{level}-AskSize"].to_numpy() - data[f"L{level}-BidSize"].to_numpy(),
-        data[f"L{level}-AskSize"].to_numpy() + data[f"L{level}-BidSize"].to_numpy(),
-    )
+    # asks, bids = [], []
+    ask_size = np.empty(shape=(len(data), level))
+    bid_size = np.empty_like(ask_size)
+    for l in range(1, level+1):
+        ask_size[:, l-1] = data[f"L{l}-AskSize"].to_numpy()
+        bid_size[:, l-1] = data[f"L{l}-BidSize"].to_numpy()
 
-    return np.mean(slope) if len(slope) else np.nan
+    # bid_size = np.column_stack([bids[i] for i in range(1, level+1)])
+    # ask_size = np.column_stack([asks[i] for i in range(1, level+1)])
+
+    return {name+str(level)+"SimpleWeighted": DGGW_scaled_depth_difference(bid_size, ask_size)}

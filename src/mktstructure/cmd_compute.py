@@ -54,6 +54,8 @@ def get_trades_and_quotes(args: argparse.Namespace):
     Here, we assume that the TAQ data has been sorted.
     "*.signed-trades.csv.gz" contains signed trades and corresponding quotes.
     "*.quotes.csv.gz" contains quotes only.
+    (In different data directory)
+    "????-??-??.csv.gz" contains LOB bid ask data.
 
     Parameters:
     args (argparse.Namespace): A namespace object from argparse containing 
@@ -76,6 +78,8 @@ def get_trades_and_quotes(args: argparse.Namespace):
         args.data_dir, file_pattern="*.signed-trades.csv.gz")
     quotes = process_files(
         args.data_dir, file_pattern="*.quotes.csv.gz")
+    lob_data = process_files(
+        args.data_dir, file_pattern="????-??-??.csv.gz")
 
     if not args.all:
         bdate = dt.fromisoformat(args.b)
@@ -86,13 +90,16 @@ def get_trades_and_quotes(args: argparse.Namespace):
         quotes = [
             (ric, date, file_path) for ric, date, file_path in quotes
             if ric in args.ric and bdate <= dt.fromisoformat(date) <= edate]
+        lob_data = [
+            (ric, date, file_path) for ric, date, file_path in lob_data
+            if ric in args.ric and bdate <= dt.fromisoformat(date) <= edate]
 
-    return signed_trades, quotes
+    return signed_trades, quotes, lob_data
 
 
 def cmd_compute(args: argparse.Namespace):
 
-    signed_trades, quotes = get_trades_and_quotes(args)
+    signed_trades, quotes, lob_data = get_trades_and_quotes(args)
     compute = partial(_compute, out_filepath=args.out)
 
     # quoted-spread based on quotes not trades
@@ -111,10 +118,10 @@ def cmd_compute(args: argparse.Namespace):
 
     # These use LOB data
     if args.bid_slope:
-        compute(measures.bid_slope, signed_trades)
+        compute(measures.bid_slope, lob_data)
     if args.ask_slope:
-        compute(measures.ask_slope, signed_trades)
+        compute(measures.ask_slope, lob_data)
     if args.scaled_depth_diff_1:
-        compute(measures.sdd1, signed_trades)
+        compute(measures.sdd1, lob_data)
     if args.scaled_depth_diff_5:
-        compute(measures.sdd5, signed_trades)
+        compute(measures.sdd5, lob_data)
