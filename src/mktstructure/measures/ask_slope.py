@@ -1,6 +1,8 @@
+from typing import Dict
 import numpy as np
 import pandas as pd
 
+from frds.measures.lob_slope import DGGW_ask_slope
 from .exceptions import *
 
 name = "AskSlope"
@@ -17,18 +19,22 @@ vars_needed = {
 }
 
 
-def estimate(data: pd.DataFrame) -> np.ndarray:
+def estimate(data: pd.DataFrame) -> Dict[str, float]:
     if not vars_needed.issubset(data.columns):
         raise MissingVariableError(name, vars_needed.difference(data.columns))
 
     data = data.dropna(subset=vars_needed)
+    level = 5
 
-    slope = np.divide(
-        data["L1-AskSize"].to_numpy()
-        + data["L2-AskSize"].to_numpy()
-        + data["L3-AskSize"].to_numpy()
-        + data["L4-AskSize"].to_numpy()
-        + data["L5-AskSize"].to_numpy(),
-        data["L5-AskPrice"] - (data["L1-AskPrice"] - data["L1-BidPrice"]) / 2,
-    )
-    return np.mean(slope) if len(slope) else np.nan
+    data = data[data["L1-BidPrice"] < data["L1-AskPrice"]]
+
+    ask_size = np.empty(shape=(len(data), level))
+    for l in range(1, level+1):
+        ask_size[:, l-1] = data[f"L{l}-AskSize"].to_numpy()
+
+    ask_price_highest_level = data[f"L{level}-AskPrice"].to_numpy()
+    midpt = (data["L1-BidPrice"] + data["L1-AskPrice"]).to_numpy() / 2
+
+    # This measure may not be comparable across stocks given that it's
+    # total depth / (price - midpoint)
+    return {name+str(level)+"SimpleWeighted": DGGW_ask_slope(ask_size, ask_price_highest_level, midpt)}

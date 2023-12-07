@@ -25,14 +25,10 @@ def estimate(data: pd.DataFrame, level=1) -> np.ndarray:
 
     data = data.dropna(subset=vars_needed)
 
-    # asks, bids = [], []
     ask_size = np.empty(shape=(len(data), level))
     bid_size = np.empty_like(ask_size)
     for l in range(1, level+1):
         ask_size[:, l-1] = data[f"L{l}-AskSize"].to_numpy()
         bid_size[:, l-1] = data[f"L{l}-BidSize"].to_numpy()
-
-    # bid_size = np.column_stack([bids[i] for i in range(1, level+1)])
-    # ask_size = np.column_stack([asks[i] for i in range(1, level+1)])
 
     return {name+str(level)+"SimpleWeighted": DGGW_scaled_depth_difference(bid_size, ask_size)}
