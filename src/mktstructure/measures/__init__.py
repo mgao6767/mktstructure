@@ -8,6 +8,8 @@ from . import (
     ask_slope,
     scaled_depth_difference,
     kyle_lambda,
+    bid_slope_difference,
+    ask_slope_difference
 )
 
 

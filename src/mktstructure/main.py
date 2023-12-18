@@ -303,6 +303,20 @@ def init_argparse() -> argparse.ArgumentParser:
         help="if set, compute the ask slope",
     )
     parser_compute.add_argument(
+        "--bid_slope_diff",
+        default=False,
+        const=True,
+        action="store_const",
+        help="if set, compute the bid-side slope difference",
+    )
+    parser_compute.add_argument(
+        "--ask_slope_diff",
+        default=False,
+        const=True,
+        action="store_const",
+        help="if set, compute the ask-side slope difference",
+    )
+    parser_compute.add_argument(
         "--scaled_depth_diff_1",
         default=False,
         const=True,

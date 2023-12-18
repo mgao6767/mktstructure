@@ -123,6 +123,10 @@ def cmd_compute(args: argparse.Namespace):
         compute(measures.bid_slope, lob_data)
     if args.ask_slope:
         compute(measures.ask_slope, lob_data)
+    if args.bid_slope_diff:
+        compute(measures.bid_slope_difference, lob_data)
+    if args.ask_slope_diff:
+        compute(measures.ask_slope_difference, lob_data)
     if args.scaled_depth_diff_1:
         compute(measures.sdd1, lob_data)
     if args.scaled_depth_diff_5:
