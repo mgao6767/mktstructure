@@ -7,6 +7,7 @@ from . import (
     bid_slope,
     ask_slope,
     scaled_depth_difference,
+    kyle_lambda,
 )
 
 

@@ -316,6 +316,13 @@ def init_argparse() -> argparse.ArgumentParser:
         action="store_const",
         help="if set, compute the scaled depth difference at the 5th level",
     )
+    parser_compute.add_argument(
+        "--kyle_lambda",
+        default=False,
+        const=True,
+        action="store_const",
+        help="if set, compute the Kyle's Lambda",
+    )
 
     return parser
 

@@ -115,6 +115,8 @@ def cmd_compute(args: argparse.Namespace):
         compute(measures.price_impact, signed_trades)
     if args.variance_ratio:
         compute(measures.variance_ratio, signed_trades)
+    if args.kyle_lambda:
+        compute(measures.kyle_lambda, signed_trades)
 
     # These use LOB data
     if args.bid_slope:
