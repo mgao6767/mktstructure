@@ -16,6 +16,9 @@ def format_result(date, ric, measure_name, result):
 def afunc(func, params):
     ric, date, path = params
     df = pd.read_csv(path)
+    # less than 100 trades or quotes a day
+    if len(df) < 100:
+        return None
     df = transform_taq(df)
     return func(df)
 
@@ -27,19 +30,19 @@ def _compute(measure, data, out_filepath="results.csv"):
 
     with open(out_filepath, "w", encoding="utf-8") as fout:
         for res, (ric, date, _) in zip(results, data):
-            assert isinstance(res, dict)
-            for name, value in res.items():
-                print(format_result(date, ric, name, value), file=fout)
-            # # Variance ratio test returns a list of results
-            # if measure.name == "LoMacKinlay1988":
-            #     assert isinstance(res, list)
-            #     for r in res:
-            #         for k, v in r.items():
-            #             formated = format_result(date, ric, k, v)
-            #             print(formated, file=fout)
-            # else:
-            #     result_formated = format_result(date, ric, measure.name, res)
-            #     print(result_formated, file=fout)
+            if isinstance(res, dict):
+                for name, value in res.items():
+                    print(format_result(date, ric, name, value), file=fout)
+                # # Variance ratio test returns a list of results
+                # if measure.name == "LoMacKinlay1988":
+                #     assert isinstance(res, list)
+                #     for r in res:
+                #         for k, v in r.items():
+                #             formated = format_result(date, ric, k, v)
+                #             print(formated, file=fout)
+                # else:
+                #     result_formated = format_result(date, ric, measure.name, res)
+                #     print(result_formated, file=fout)
 
 
 def get_trades_and_quotes(args: argparse.Namespace):
@@ -75,7 +78,7 @@ def get_trades_and_quotes(args: argparse.Namespace):
             that meet the filtering criteria.
     """
     signed_trades = process_files(
-        args.data_dir, file_pattern="*.signed-trades.csv.gz")
+        args.data_dir, file_pattern="*.sorted.signed.csv.gz")
     quotes = process_files(
         args.data_dir, file_pattern="*.quotes.csv.gz")
     lob_data = process_files(
@@ -117,6 +120,8 @@ def cmd_compute(args: argparse.Namespace):
         compute(measures.variance_ratio, signed_trades)
     if args.kyle_lambda:
         compute(measures.kyle_lambda, signed_trades)
+    if args.pin:
+        compute(measures.pin, signed_trades)
 
     # These use LOB data
     if args.bid_slope:
