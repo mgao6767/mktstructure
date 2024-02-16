@@ -6,27 +6,30 @@ import pandas as pd
 
 from . import measures
 from .parx import parx
-from .utils import process_files, transform_taq
+from .utils import process_files, transform_taq, filter_quotes
 
 
 def format_result(date, ric, measure_name, result):
     return ",".join([date, ric, measure_name, str(result)])
 
 
-def afunc(func, params):
+def afunc(func, params, use_quotes=False):
     ric, date, path = params
     df = pd.read_csv(path)
     # less than 100 trades or quotes a day
     if len(df) < 100:
         return None
     df = transform_taq(df)
+    if use_quotes:
+        df = filter_quotes(df)
     return func(df)
 
 
-def _compute(measure, data, out_filepath="results.csv"):
+def _compute(measure, data, out_filepath="results.csv", use_quotes=False):
     assert hasattr(measure, "estimate")
     assert isinstance(measure.estimate, Callable)
-    results = parx(partial(afunc, measure.estimate), data)
+    results = parx(partial(afunc, measure.estimate,
+                   use_quotes=use_quotes), data)
 
     with open(out_filepath, "w", encoding="utf-8") as fout:
         for res, (ric, date, _) in zip(results, data):
@@ -80,7 +83,7 @@ def get_trades_and_quotes(args: argparse.Namespace):
     signed_trades = process_files(
         args.data_dir, file_pattern="*.sorted.signed.csv.gz")
     quotes = process_files(
-        args.data_dir, file_pattern="*.quotes.csv.gz")
+        args.data_dir, file_pattern="*.sorted.csv.gz")
     lob_data = process_files(
         args.data_dir, file_pattern="????-??-??.csv.gz")
 
@@ -107,7 +110,7 @@ def cmd_compute(args: argparse.Namespace):
 
     # quoted-spread based on quotes not trades
     if args.quoted_spread:
-        compute(measures.quoted_spread, quotes)
+        compute(measures.quoted_spread, quotes, use_quotes=True)
 
     # others use signed trades (and quotes)
     if args.effective_spread:

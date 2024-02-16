@@ -24,8 +24,14 @@ def estimate(data: pd.DataFrame) -> Dict[str, float]:
     data['Time Interval'] = data.index.to_series(
     ).diff().dt.total_seconds().shift(-1)
 
+    if data.empty:
+        return {name+"SimpleWeighted": np.nan,
+                name+"TimeWeighted": np.nan}
+
     # Handle the last interval (optional)
     data.iloc[-1, data.columns.get_loc('Time Interval')] = np.nan
+
+    data.dropna(subset=['Spread', 'Time Interval'], inplace=True)
 
     # Compute the time-weighted bid-ask spread
     time_weighted_spread = (data['Spread'] * data['Time Interval']

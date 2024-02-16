@@ -337,6 +337,13 @@ def init_argparse() -> argparse.ArgumentParser:
         action="store_const",
         help="if set, compute the Kyle's Lambda",
     )
+    parser_compute.add_argument(
+        "--pin",
+        default=False,
+        const=True,
+        action="store_const",
+        help="if set, compute the probability of informed trading (PIN)",
+    )
 
     return parser
 
