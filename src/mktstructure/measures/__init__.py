@@ -11,6 +11,7 @@ from . import (
     bid_slope_difference,
     ask_slope_difference,
     pin,
+    vwap
 )
 
 

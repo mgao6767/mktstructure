@@ -125,6 +125,8 @@ def cmd_compute(args: argparse.Namespace):
         compute(measures.kyle_lambda, signed_trades)
     if args.pin:
         compute(measures.pin, signed_trades)
+    if args.vwap:
+        compute(measures.vwap, signed_trades)
 
     # These use LOB data
     if args.bid_slope:

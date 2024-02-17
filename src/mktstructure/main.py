@@ -344,6 +344,13 @@ def init_argparse() -> argparse.ArgumentParser:
         action="store_const",
         help="if set, compute the probability of informed trading (PIN)",
     )
+    parser_compute.add_argument(
+        "--vwap",
+        default=False,
+        const=True,
+        action="store_const",
+        help="if set, compute the volume-weighted average price (VWAP)",
+    )
 
     return parser
 
