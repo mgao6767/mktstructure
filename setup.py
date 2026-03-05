@@ -34,7 +34,6 @@ setup(
         "": ["LICENSE", "README.md", "*.c"],
     },
     classifiers=[
-        "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.8",
         "Intended Audience :: End Users/Desktop",
