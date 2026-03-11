@@ -1,5 +1,5 @@
 __version__ = "0.2.10"
 __description__ = """Download data from Refinitiv Tick History and compute some market microstructure measures."""
 __author__ = "Mingze Gao"
-__author_email__ = "mingze.gao@sydney.edu.au"
+__author_email__ = "mingze.gao@mq.edu.au"
 __github_url__ = "https://github.com/mgao6767/mktstructure"
